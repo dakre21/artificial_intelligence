@@ -4,6 +4,14 @@ int main(int argc, const char * argv[]) {
     // Forward declarations for algorithm
     const char* file_name = "output.txt";
     string str            = "";
+    int cap_jug_a         = 0;
+    int cap_jug_b         = 0;
+    int init_jug_a        = 0;
+    int init_jug_b        = 0;
+    int goal_jug_a        = 0;
+    int goal_jug_b        = 0;
+    int count             = 0;
+    const char* tmp;
 
     // Step 0 - Readin the input file
     ifstream file_in;
@@ -16,9 +24,36 @@ int main(int argc, const char * argv[]) {
     }
    
     // Step 1 - Split input file into container capacity, initial state, and goal state
-    while (file_in >> str) {
-        cout << str << endl; 
+    while (getline(file_in, str)) {
+        //cout << str << endl;
+        tmp = strstr(str.c_str(), ":");
+
+        // Input file layout assumption:
+        // Capacity of jug A 
+        // Capacity of jug B
+        // Initial State
+        // Goal State 
+        switch (count) {        
+            case 0 : sscanf(tmp, ": %d", &cap_jug_a);
+            case 1 : sscanf(tmp, ": %d", &cap_jug_b);
+            case 2 : sscanf(tmp, ": %d %d", &init_jug_a, &init_jug_b);
+            case 3 : sscanf(tmp, ": %d %d", &goal_jug_a, &goal_jug_b);
+            default:
+                break;
+        }
+
+        count++;
     }
+
+    cout << cap_jug_a << endl;
+    cout << cap_jug_b << endl;
+    cout << init_jug_a << endl;
+    cout << init_jug_b << endl;
+    cout << goal_jug_a << endl;
+    cout << goal_jug_b << endl;
+
+    // Reset count
+    count = 0;
 
     // Step 2 - Apply strategy A (random) to get to goal state 
 
