@@ -12,7 +12,6 @@ int main(int argc, const char * argv[]) {
     int goal_jug_b        = 0;
     int count             = 0;
     queue<pair<int, int> > visited;
-    vector<pair<int, int> > states;
     pair<int, int> curr_state;
     const char* tmp;
 
@@ -50,13 +49,6 @@ int main(int argc, const char * argv[]) {
         count++;
     }
 
-    // Step 1.2 - Setup state space
-    for (int i = 0; i < cap_jug_a; i++) {
-        for (int j = 0; j < cap_jug_b; j++) {
-            states.push_back(pair<int, int>(i, j));
-        }
-    }
-
     // Set current state of jugs to initial state
     visited.push({init_jug_a, init_jug_b});
     curr_state = visited.front();
@@ -64,18 +56,8 @@ int main(int argc, const char * argv[]) {
     // Step 2- Apply strategy A (random) to get to goal state
     strategyA(file_name, curr_state, goal_jug_a, goal_jug_b, cap_jug_a, cap_jug_b);
 
-    // Setup output file
-    ofstream out_file;
-    out_file.open(file_name, ofstream::out | ofstream::app);
-
     // Step 3 - Apply strategy B (BFS) to get to goal state 
-    cout << ">Strategy B" << endl;
-    cout << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-        "-gal jug --- state:(" << init_jug_a << "," << init_jug_b << ")" << endl;
-    out_file << ">Strategy B\n";
-    out_file << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-        "-gal jug --- state:(" << init_jug_a << "," << init_jug_b << ")\n";
-  
-    out_file.close();
+    strategyB(file_name, curr_state, visited, goal_jug_a, goal_jug_b, cap_jug_a, cap_jug_b);
+ 
     return 0;
 }

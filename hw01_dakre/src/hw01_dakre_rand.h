@@ -159,4 +159,6 @@ void strategyA(string file_name, pair<int, int> curr_state, int goal_jug_a, int 
 
         count++;
     }
+
+    out_file.close();
 }
