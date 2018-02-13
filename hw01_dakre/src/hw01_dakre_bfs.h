@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stdio.h>
-#include <queue>
+#include <stack>
 #include <list>
 #include <map>
 
@@ -37,7 +37,7 @@ public:
         int fill_amount_b         = 0;
         int fill                  = 0;
         pair<int, int> curr_state = state;
-        queue<pair<int, int> > path;
+        stack<pair<int, int> > path;
         map<pair<int, int>, int> pot_states;
         map<pair<int, int>, bool>::iterator sub_it;
         map<pair<int, int>, int>::iterator it;
@@ -52,14 +52,14 @@ public:
 
         cout << ">Strategy B" << endl;
         cout << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-            "-gal jug --- state:(" << curr_state.first << "," << curr_state.second << ")" << endl;
+            "-gal jug --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
         out_file << ">Strategy B\n";
         out_file << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-            "-gal jug --- state:(" << curr_state.first << "," << curr_state.second << ")\n";
+            "-gal jug --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
 
         while (!path.empty()) {
-            // Dequeue curr_state top vertex
-            curr_state = path.front();
+            // Grab state from the top of the stack
+            curr_state = path.top();
             path.pop();
 
             for (it = pot_states.begin(); it != pot_states.end(); ++it) {
@@ -198,9 +198,12 @@ public:
             }
 
             for (it = pot_states.begin(); it != pot_states.end(); ++it) {
+               // cout << "Potential state: " << it->first.first << " " << it->first.second << endl;
                 for (sub_it = this->_states.begin(); sub_it != this->_states.end(); ++sub_it) {
                     if (it->first == sub_it->first) {
                         if (sub_it->second == false) {
+                            //cout << "Found new node!" << endl;
+                            //cout << "Search space state: " << it->first.first << " " << it->first.second << endl;
                             sub_it->second = true;
                             path.push(sub_it->first);
                         }

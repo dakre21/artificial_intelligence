@@ -35,10 +35,10 @@ void strategyA(string file_name, pair<int, int> curr_state, int goal_jug_a, int 
 
     cout << ">Strategy A" << endl;
     cout << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-        "-gal jug --- state:(" << curr_state.first << "," << curr_state.second << ")" << endl;
+        "-gal jug --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
     out_file << ">Strategy A\n";
     out_file << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-        "-gal jug --- state:(" << curr_state.first << "," << curr_state.second << ")\n";
+        "-gal jug --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
     while (!solved) {
         // Check if count has exceeded limit
         if (count >= LIMIT) {
