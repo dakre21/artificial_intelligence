@@ -1,6 +1,6 @@
 #include "hw01_dakre.h"
 
-// States and Limits
+// Limit
 #define LIMIT   250
 #define NSTATES 6
 #define EMPTYA  0
@@ -20,13 +20,16 @@ int main(int argc, const char * argv[]) {
     int init_jug_b        = 0;
     int goal_jug_a        = 0;
     int goal_jug_b        = 0;
-    int curr_jug_a        = 0;
-    int curr_jug_b        = 0;
     int count             = 0;
     int rnum              = 0;
-    int pour_jug          = 0;
-    bool bad_move         = false;
+    int fill_amount_a     = 0;
+    int fill_amount_b     = 0;
+    int fill              = 0;
     bool solved           = false;
+    bool bad_move         = false;
+    queue<pair<int, int> > visited;
+    vector<pair<int, int> > states;
+    pair<int, int> curr_state;
     const char* tmp;
 
     // Step 0 - Readin the input file
@@ -44,7 +47,6 @@ int main(int argc, const char * argv[]) {
    
     // Step 1 - Split input file into container capacity, initial state, and goal state
     while (getline(file_in, str)) {
-        //cout << str << endl;
         tmp = strstr(str.c_str(), ":");
 
         // Input file layout assumption:
@@ -64,6 +66,13 @@ int main(int argc, const char * argv[]) {
         count++;
     }
 
+    // Step 1.2 - Setup state space
+    for (int i = 0; i < cap_jug_a; i++) {
+        for (int j = 0; j < cap_jug_b; j++) {
+            states.push_back(pair<int, int>(i, j));
+        }
+    }
+
     // Reset count
     count = 0;
 
@@ -81,19 +90,24 @@ int main(int argc, const char * argv[]) {
     }
 
     // Set current state of jugs to initial state
-    curr_jug_a = init_jug_a;
-    curr_jug_b = init_jug_b;
+    visited.push({init_jug_a, init_jug_b});
+    curr_state = visited.front();
 
     // Step 2 - Apply strategy A (random) to get to goal state 
     cout << ">Strategy A" << endl;
     cout << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-        "-gal jug ---state:(" << init_jug_a << "," << init_jug_b << ")" << endl;
+        "-gal jug --- state:(" << init_jug_a << "," << init_jug_b << ")" << endl;
     out_file << ">Strategy A\n";
     out_file << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-        "-gal jug ---state:(" << init_jug_a << "," << init_jug_b << ")\n";
+        "-gal jug --- state:(" << init_jug_a << "," << init_jug_b << ")\n";
     while (!solved) {
         // Check if count has exceeded limit
         if (count >= LIMIT) {
+            break;
+        }
+
+        if (curr_state.first == goal_jug_a && curr_state.second == goal_jug_b) {
+            solved = true;
             break;
         }
 
@@ -101,84 +115,88 @@ int main(int argc, const char * argv[]) {
         rnum = rand() % NSTATES;
         switch (rnum) {
             case EMPTYA :
-                // If jug is already full negate this move
-                if (curr_jug_a == 0) {
+                if (curr_state.first == 0) {
                     bad_move = true;
                     break;
                 }
-                curr_jug_a = 0;            
-                cout << "Empty the " << cap_jug_a << "-gal jug";
-                out_file << "Empty the " << cap_jug_a << "-gal jug";
+                curr_state.first = 0;            
+                cout << ">Empty the " << cap_jug_a << "-gal jug";
+                out_file << ">Empty the " << cap_jug_a << "-gal jug";
                 break;
                 
             case EMPTYB :
-                // If jug is already full negate this move
-                if (curr_jug_b == 0) {
+                if (curr_state.second == 0) {
                     bad_move = true;
                     break;
                 }
-                curr_jug_b = 0;            
-                cout << "Empty the " << cap_jug_b << "-gal jug";
-                out_file << "Empty the " << cap_jug_b << "-gal jug";
+                curr_state.second = 0;            
+                cout << ">Empty the " << cap_jug_b << "-gal jug";
+                out_file << ">Empty the " << cap_jug_b << "-gal jug";
                 break;
  
             case FILLA :
-                // If jug is already full negate this move
-                if (curr_jug_a == cap_jug_a) {
+                if (curr_state.first == cap_jug_a) {
                     bad_move = true;
                     break;
                 }
-                curr_jug_a = cap_jug_a;            
-                cout << "Fill the " << cap_jug_a << "-gal jug";
-                out_file << "Fill the " << cap_jug_a << "-gal jug";
+                curr_state.first = cap_jug_a;            
+                cout << ">Fill the " << cap_jug_a << "-gal jug";
+                out_file << ">Fill the " << cap_jug_a << "-gal jug";
                 break;
  
             case FILLB :
-                // If jug is already full negate this move
-                if (curr_jug_b == cap_jug_b) {
+                if (curr_state.second == cap_jug_b) {
                     bad_move = true;
                     break;
                 }
-                curr_jug_b = cap_jug_b;            
-                cout << "Fill the " << cap_jug_b << "-gal jug";
-                out_file << "Fill the " << cap_jug_b << "-gal jug";
+                curr_state.second = cap_jug_b;            
+                cout << ">Fill the " << cap_jug_b << "-gal jug";
+                out_file << ">Fill the " << cap_jug_b << "-gal jug";
                 break;
  
             case POURAB :
-                cout << "In pour a to b" << endl;
-                pour_jug = curr_jug_a - cap_jug_b - curr_jug_b;
-                cout << "pour " << pour_jug << " a " << curr_jug_a << " b " << curr_jug_b << " cap b " << cap_jug_b << endl;
-
-                if (pour_jug <= 0) {
+                if (((cap_jug_b - curr_state.second) == 0) || (curr_state.first == 0)) {
                     bad_move = true;
                     break;
-                }                
+                }
 
-                curr_jug_a -= pour_jug;
-                curr_jug_b += pour_jug;
+                fill_amount_b = cap_jug_b - curr_state.second;
 
-                cout << "Pour water from the " << cap_jug_a << "-gal jug into the " 
+                if (curr_state.first <= fill_amount_b) {
+                    fill = curr_state.first;
+                } else {
+                    fill = fill_amount_b;
+                }
+
+                curr_state.first -= fill;
+                curr_state.second += fill;
+
+                cout << ">Pour water from the " << cap_jug_a << "-gal jug into the " 
                     << cap_jug_b << "-gal jug";
-                out_file << "Pour water from the " << cap_jug_a << "-gal jug into the " 
+                out_file << ">Pour water from the " << cap_jug_a << "-gal jug into the " 
                     << cap_jug_b << "-gal jug";
                 break;
  
             case POURBA :
-                cout << "In pour b to a" << endl;
-                pour_jug = curr_jug_b - cap_jug_a - curr_jug_a;
-                cout << "pour " << pour_jug << " a " << curr_jug_a << " b " << curr_jug_b << " cap a " << cap_jug_a << endl;
-
-                if (pour_jug <= 0) {
+                if (((cap_jug_a - curr_state.first) == 0) || (curr_state.second == 0)) {
                     bad_move = true;
                     break;
-                }                
+                }
 
-                curr_jug_b -= pour_jug;
-                curr_jug_a += pour_jug;
+                fill_amount_a = cap_jug_a - curr_state.first;
 
-                cout << "Pour water from the " << cap_jug_b << "-gal jug into the " 
+                if (curr_state.second <= fill_amount_a) {
+                    fill = curr_state.second;
+                } else {
+                    fill = fill_amount_a;
+                }
+
+                curr_state.first += fill;
+                curr_state.second -= fill;
+
+                cout << ">Pour water from the " << cap_jug_b << "-gal jug into the " 
                     << cap_jug_a << "-gal jug";
-                out_file << "Pour water from the " << cap_jug_b << "-gal jug into the " 
+                out_file << ">Pour water from the " << cap_jug_b << "-gal jug into the " 
                     << cap_jug_a << "-gal jug";
                 break;
 
@@ -187,43 +205,16 @@ int main(int argc, const char * argv[]) {
         }
 
         if (!bad_move) {
-            cout << "  --- state: (" << curr_jug_a << "," << curr_jug_b << ")" << endl;
-            out_file << "  --- state: (" << curr_jug_a << "," << curr_jug_b << ")\n";
+            cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
+            out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
         } else {
             bad_move = false;
             continue;
         }
 
-        if (curr_jug_a == goal_jug_a && curr_jug_b == goal_jug_b) {
-            cout << solved << endl;
-            solved = true;
-        }
-
         count++;
     }
   
-    /* 
-    // Reset solved flag 
-    out_file << "\n";
-    solved = false; 
-
-    // Set current state of jugs to initial state
-    curr_jug_a = init_jug_a;
-    curr_jug_b = init_jug_b;
-
-    // Step 3 - Apply strategy B (systematic state expansion) to get to goal state
-    cout << ">Strategy B" << endl;
-    cout << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-        "-gal jug ---state:(" << init_jug_a << "," << init_jug_b << ")" << endl;
-    out_file << ">Strategy B\n";
-    out_file << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
-        "-gal jug ---state:(" << init_jug_a << "," << init_jug_b << ")\n";
-    while (!solved) {
-        break;
-    }
-    */
-
     out_file.close();
-
     return 0;
 }
