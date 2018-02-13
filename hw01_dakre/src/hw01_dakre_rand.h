@@ -6,15 +6,15 @@
 #include <cstdlib>
 #include <stdio.h>
 
-// Definitions for limits and states
-#define LIMIT   250
-#define NSTATES 6
-#define EMPTYA  0
-#define EMPTYB  1 
-#define FILLA   2
-#define FILLB   3
-#define POURAB  4
-#define POURBA  5
+// Definitions for limits and operators
+#define LIMIT      250
+#define NOPERATORS 6
+#define EMPTYA     0
+#define EMPTYB     1 
+#define FILLA      2
+#define FILLB      3
+#define POURAB     4
+#define POURBA     5
 
 using namespace std;
 
@@ -57,7 +57,7 @@ void strategyA(string file_name, pair<int, int> curr_state, int goal_jug_a, int 
         }
 
         // Randomly select a state per strategy A
-        rnum = rand() % NSTATES;
+        rnum = rand() % NOPERATORS;
         switch (rnum) {
             case EMPTYA :
                 if (curr_state.first == 0) {

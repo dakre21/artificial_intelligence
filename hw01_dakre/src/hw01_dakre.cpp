@@ -11,7 +11,6 @@ int main(int argc, const char * argv[]) {
     int goal_jug_a        = 0;
     int goal_jug_b        = 0;
     int count             = 0;
-    queue<pair<int, int> > visited;
     pair<int, int> curr_state;
     const char* tmp;
 
@@ -50,14 +49,13 @@ int main(int argc, const char * argv[]) {
     }
 
     // Set current state of jugs to initial state
-    visited.push({init_jug_a, init_jug_b});
-    curr_state = visited.front();
+    curr_state = {init_jug_a, init_jug_b};
 
     // Step 2- Apply strategy A (random) to get to goal state
     strategyA(file_name, curr_state, goal_jug_a, goal_jug_b, cap_jug_a, cap_jug_b);
 
     // Step 3 - Apply strategy B (BFS) to get to goal state 
-    strategyB(file_name, curr_state, visited, goal_jug_a, goal_jug_b, cap_jug_a, cap_jug_b);
+    strategyB(file_name, curr_state, goal_jug_a, goal_jug_b, cap_jug_a, cap_jug_b);
  
     return 0;
 }
