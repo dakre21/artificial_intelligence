@@ -80,15 +80,6 @@ int main(int argc, const char * argv[]) {
     ofstream out_file;
     out_file.open(file_name);
 
-    // Confirm goal states
-    if (goal_jug_a < 0) {
-        goal_jug_a = cap_jug_a + goal_jug_a;
-    }
-
-    if (goal_jug_b < 0) {
-        goal_jug_b = cap_jug_b + goal_jug_b;
-    }
-
     // Set current state of jugs to initial state
     visited.push({init_jug_a, init_jug_b});
     curr_state = visited.front();
@@ -106,7 +97,12 @@ int main(int argc, const char * argv[]) {
             break;
         }
 
-        if (curr_state.first == goal_jug_a && curr_state.second == goal_jug_b) {
+        if ((curr_state.first == goal_jug_a && curr_state.second == goal_jug_b) ||
+            (goal_jug_a == -1 && curr_state.first <= cap_jug_a && 
+             curr_state.second == goal_jug_b) ||
+            (goal_jug_b == -1 && curr_state.second <= cap_jug_b &&
+             curr_state.first == goal_jug_a) ||
+            (goal_jug_a == -1 && goal_jug_b == -1)) {
             solved = true;
             break;
         }
