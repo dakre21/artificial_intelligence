@@ -51,6 +51,8 @@ public:
         ofstream out_file;
         out_file.open(file_name, ofstream::out | ofstream::app);
 
+        cout << endl;
+        out_file << "\n";
         cout << ">Strategy B" << endl;
         cout << ">Starting out with a " << cap_jug_a << "-gal jug and a " << cap_jug_b << 
             "-gal jug --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
@@ -59,13 +61,8 @@ public:
             "-gal jug --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
 
         while (!path.empty()) {
-            cout << "Before" << endl;
-            for (size_t i = 0; i < path.size(); i++) {
-                cout << path[i].first << " " << path[i].second << endl;
-            }
             for (size_t i = 0; i < path.size(); i++) {
                 curr_state = path[i];
-                cout << "Curr state " << curr_state.first << " " << curr_state.second << " i " << i << endl;
                 for (it = pot_states.begin(); it != pot_states.end(); ++it) {
                     if (curr_state == it->first) {
                         switch (it->second) {
@@ -134,11 +131,6 @@ public:
                     found_op = false;
                     break;
                 }
-            }
-
-            cout << "After" << endl;
-            for (size_t i = 0; i < path.size(); i++) {
-                cout << path[i].first << " " << path[i].second << endl;
             }
             
             // Check if goal state is reached
@@ -211,7 +203,7 @@ public:
                             fill = fill_amount_a;
                         }
 
-                        pot_states.insert(pair<pair<int, int>, int>({curr_state.first + fill, curr_state.second - fill}, POURAB));
+                        pot_states.insert(pair<pair<int, int>, int>({curr_state.first + fill, curr_state.second - fill}, POURBA));
 
                         break;
 
