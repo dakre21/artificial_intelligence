@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stdio.h>
-#include <stack>
+#include <vector>
 #include <list>
 #include <map>
 
@@ -36,15 +36,16 @@ public:
         int fill_amount_a         = 0;
         int fill_amount_b         = 0;
         int fill                  = 0;
+        bool found_op             = true;
         pair<int, int> curr_state = state;
-        stack<pair<int, int> > path;
+        vector<pair<int, int> > path;
         map<pair<int, int>, int> pot_states;
         map<pair<int, int>, bool>::iterator sub_it;
         map<pair<int, int>, int>::iterator it;
 
         // Mark index node as states
         this->_states[state] = 1;
-        path.push(state);
+        path.insert(path.begin(), state);
 
         // Append to the output file
         ofstream out_file;
@@ -58,64 +59,86 @@ public:
             "-gal jug --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
 
         while (!path.empty()) {
-            // Grab state from the top of the stack
-            curr_state = path.top();
-            path.pop();
+            cout << "Before" << endl;
+            for (size_t i = 0; i < path.size(); i++) {
+                cout << path[i].first << " " << path[i].second << endl;
+            }
+            for (size_t i = 0; i < path.size(); i++) {
+                curr_state = path[i];
+                cout << "Curr state " << curr_state.first << " " << curr_state.second << " i " << i << endl;
+                for (it = pot_states.begin(); it != pot_states.end(); ++it) {
+                    if (curr_state == it->first) {
+                        switch (it->second) {
+                            case EMPTYA :
+                                cout << ">Empty the " << cap_jug_a << "-gal jug";
+                                out_file << ">Empty the " << cap_jug_a << "-gal jug";
+                                cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
+                                out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
+                                found_op = true;
+                                break;
 
-            for (it = pot_states.begin(); it != pot_states.end(); ++it) {
-                if (curr_state == it->first) {
-                    switch (it->second) {
-                        case EMPTYA :
-                            cout << ">Empty the " << cap_jug_a << "-gal jug";
-                            out_file << ">Empty the " << cap_jug_a << "-gal jug";
-                            cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
-                            out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
-                            break;
+                            case EMPTYB :
+                                cout << ">Empty the " << cap_jug_b << "-gal jug";
+                                out_file << ">Empty the " << cap_jug_b << "-gal jug";
+                                cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
+                                out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
+                                found_op = true;
+                                break;
 
-                        case EMPTYB :
-                            cout << ">Empty the " << cap_jug_b << "-gal jug";
-                            out_file << ">Empty the " << cap_jug_b << "-gal jug";
-                            cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
-                            out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
-                            break;
+                            case FILLA :
+                                cout << ">Fill the " << cap_jug_a << "-gal jug";
+                                out_file << ">Fill the " << cap_jug_a << "-gal jug";
+                                cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
+                                out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
+                                found_op = true;
+                                break;
+           
+                            case FILLB :
+                                cout << ">Fill the " << cap_jug_b << "-gal jug";
+                                out_file << ">Fill the " << cap_jug_b << "-gal jug";
+                                cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
+                                out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
+                                found_op = true;
+                                break;
 
-                        case FILLA :
-                            cout << ">Fill the " << cap_jug_a << "-gal jug";
-                            out_file << ">Fill the " << cap_jug_a << "-gal jug";
-                            cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
-                            out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
-                            break;
-       
-                        case FILLB :
-                            cout << ">Fill the " << cap_jug_b << "-gal jug";
-                            out_file << ">Fill the " << cap_jug_b << "-gal jug";
-                            cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
-                            out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
-                            break;
+                            case POURAB :
+                                cout << ">Pour water from the " << cap_jug_a << "-gal jug into the " 
+                                    << cap_jug_b << "-gal jug";
+                                out_file << ">Pour water from the " << cap_jug_a << "-gal jug into the " 
+                                    << cap_jug_b << "-gal jug";
+                                cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
+                                out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
+                                found_op = true;
+                                break;
 
-                        case POURAB :
-                            cout << ">Pour water from the " << cap_jug_a << "-gal jug into the " 
-                                << cap_jug_b << "-gal jug";
-                            out_file << ">Pour water from the " << cap_jug_a << "-gal jug into the " 
-                                << cap_jug_b << "-gal jug";
-                            cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
-                            out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
-                            break;
-
-                        case POURBA :
-                            cout << ">Pour water from the " << cap_jug_b << "-gal jug into the " 
-                                << cap_jug_a << "-gal jug";
-                            out_file << ">Pour water from the " << cap_jug_b << "-gal jug into the " 
-                                << cap_jug_a << "-gal jug";
-                            cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
-                            out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
-                            break;
-         
-                        default:
-                            break;
+                            case POURBA :
+                                cout << ">Pour water from the " << cap_jug_b << "-gal jug into the " 
+                                    << cap_jug_a << "-gal jug";
+                                out_file << ">Pour water from the " << cap_jug_b << "-gal jug into the " 
+                                    << cap_jug_a << "-gal jug";
+                                cout << " --- state: (" << curr_state.first << "," << curr_state.second << ")" << endl;
+                                out_file << " --- state: (" << curr_state.first << "," << curr_state.second << ")\n";
+                                found_op = true;
+                                break;
+             
+                            default:
+                                break;
+                        }
+                        break;
                     }
+
+                    
+                }
+                if (found_op) {
+                    path.erase(path.begin() + i);
+                    found_op = false;
                     break;
                 }
+            }
+
+            cout << "After" << endl;
+            for (size_t i = 0; i < path.size(); i++) {
+                cout << path[i].first << " " << path[i].second << endl;
             }
             
             // Check if goal state is reached
@@ -198,14 +221,11 @@ public:
             }
 
             for (it = pot_states.begin(); it != pot_states.end(); ++it) {
-               // cout << "Potential state: " << it->first.first << " " << it->first.second << endl;
                 for (sub_it = this->_states.begin(); sub_it != this->_states.end(); ++sub_it) {
                     if (it->first == sub_it->first) {
                         if (sub_it->second == false) {
-                            //cout << "Found new node!" << endl;
-                            //cout << "Search space state: " << it->first.first << " " << it->first.second << endl;
                             sub_it->second = true;
-                            path.push(sub_it->first);
+                            path.insert(path.begin(), sub_it->first);
                         }
                         break;
                     }
