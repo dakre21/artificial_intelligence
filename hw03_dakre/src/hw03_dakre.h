@@ -1,7 +1,4 @@
 #pragma once
-#include <stdio.h>
-#include <string.h>
-#include <vector>
 
 using namespace std;
 
@@ -26,6 +23,11 @@ public:
     int* get_state() {
         return this->_state;
     };
+
+    int get_hn() {
+        return this->_hn;
+    }
+
 private:
     int* _state;
     int _hn;
