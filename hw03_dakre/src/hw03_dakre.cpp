@@ -7,51 +7,58 @@
 #include <vector>
 
 // Define Possible Actions
-#define ADJ_MOVE_L  1
-#define ADJ_MOVE_R  2
-#define HOP_ONE_L   3
-#define HOP_ONE_R   4
-#define HOP_TWO_L   5
-#define HOP_TWO_R   6
+#define ADJ_MOVE_L  0
+#define ADJ_MOVE_R  1
+#define HOP_ONE_L   2
+#define HOP_ONE_R   3
+#define HOP_TWO_L   4
+#define HOP_TWO_R   5
 #define NUM_ACTIONS 6
 
 // Globals
-int init_state[SIZE] = { 
-  BLACK, 
-  BLACK, 
-  BLACK, 
-  WHITE, 
-  WHITE, 
-  WHITE, 
-  EMPTY 
+array<int, SIZE> init_state = { 
+    BLACK, 
+    BLACK, 
+    BLACK, 
+    WHITE, 
+    WHITE, 
+    WHITE, 
+    EMPTY 
 };
 
-vector<Node> visited;
 vector<Node> observed;
 
 int main(int argc, const char* argv[]) {
     // Forward declarations
-    int   hn              = 3;
-    int   total_cost      = 0;
-    int   states_expanded = 0;
-    int   empty_pos       = 0;
-    int   pot_hn          = 0;
-    int   temp_hn         = 0;
-    int   temp_cost       = 0;
-    int   pot_cost        = 0;
-    int   match           = 0;
-    bool  finished        = false;
-    bool  skip            = false;
-    int*  curr_state      = NULL;
-    int*  temp_state      = NULL;
-    int*  pot_state       = NULL;
+    int   hn               = 3;
+    int   total_cost       = 0;
+    int   states_expanded  = 0;
+    int   empty_pos        = 0;
+    int   temp_hn          = 0;
+    int   temp_cost        = 0;
+    int   match            = 0;
+    int   index            = 0;
+    bool  finished         = false;
+    bool  skip             = false;
+    array<int, SIZE> curr_state;
+    array<int, SIZE> temp_state;
 
     // Start A* process
     // Step 1 - Populate Initial Node
-    Node node = Node(init_state, hn);
+    Node node = Node(init_state, hn, 0);
+    node.setVisited();
 
-    // Step 2 - Push initial node into visited and observed structures
-    visited.push_back(node);
+    for (size_t i = 0; i < SIZE; i++) {
+        cout << to_string(init_state[i]);
+    }
+    cout << endl;
+
+    for (size_t i = 0; i < SIZE; i++) {
+        cout << to_string(node.getState()[i]);
+    }
+    cout << endl;
+
+    // Step 2 - Push initial node into observed structures
     observed.push_back(node);
 
     // Log Initial state
@@ -60,30 +67,35 @@ int main(int argc, const char* argv[]) {
     // Step 3 - Loop until solution found
     while (finished != true) {
         // Step 4 - Grab current node and state
-        curr_state = visited[states_expanded].get_state();
-        pot_state  = NULL;
-        pot_hn     = 0;
-        pot_cost   = 0;
+        curr_state = observed[index].getState();
+
+        cout << "Current state" << endl;
+        for (size_t i = 0; i < SIZE; i++) {
+          cout << curr_state[i];
+        }
+        cout << endl;
+
+        for (size_t i = 0; i < SIZE; i++) {
+            if (curr_state[i] == EMPTY) {
+                empty_pos = i;
+                cout << "Empty pos " << to_string(empty_pos) << endl;
+            }
+        }
 
         // Step 5 - Expand state by applying actions
         // Step 6 - Take action w/ smallest cost w/ underestimate hn
         for (size_t action = 0; action < NUM_ACTIONS; action++) {
-            for (size_t i = 0; i < SIZE; i++) {
-                if (curr_state[i] == EMPTY) {
-                    empty_pos = i;
-                }
-            }
-
             // Re-initialize inner loop values
             temp_cost  = 0;
             temp_hn    = 0;
-            temp_state = curr_state;
             skip       = false;
+            temp_state = curr_state;
 
             // Switch on the action
             switch (action) {
                 case ADJ_MOVE_L:
-                    if (empty_pos < SIZE) {
+                    cout << "ADJ L MOVE" << endl;
+                    if (empty_pos < (SIZE - 1)) {
                         temp_state[empty_pos+1] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos+1];
                         temp_cost += 1;
@@ -93,6 +105,7 @@ int main(int argc, const char* argv[]) {
                     break;
                 
                 case ADJ_MOVE_R:
+                    cout << "ADJ R MOVE" << endl;
                     if (empty_pos > 0) {
                         temp_state[empty_pos-1] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos-1];
@@ -104,7 +117,8 @@ int main(int argc, const char* argv[]) {
                     break;
 
                 case HOP_ONE_L:
-                    if (empty_pos < SIZE - 1) {
+                    cout << "HOP ONE L" << endl;
+                    if (empty_pos < (SIZE - 2)) {
                         temp_state[empty_pos+2] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos+2];
                         temp_cost += 1;
@@ -115,6 +129,7 @@ int main(int argc, const char* argv[]) {
                     break;
 
                 case HOP_ONE_R:
+                    cout << "HOP ONE R" << endl;
                     if (empty_pos > 1) {
                         temp_state[empty_pos-2] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos-2];
@@ -126,7 +141,8 @@ int main(int argc, const char* argv[]) {
                     break;
 
                 case HOP_TWO_L:
-                    if (empty_pos < SIZE - 2) {
+                    cout << "HOP TWO L" << endl;
+                    if (empty_pos < (SIZE - 3)) {
                         temp_state[empty_pos+3] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos+3];
                         temp_cost += 2;
@@ -137,6 +153,7 @@ int main(int argc, const char* argv[]) {
                     break;
 
                 case HOP_TWO_R:
+                    cout << "HOP TWO R" << endl;
                     if (empty_pos > 2) {
                         temp_state[empty_pos-3] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos-3];
@@ -161,16 +178,18 @@ int main(int argc, const char* argv[]) {
                 }
             }
 
-            if (pot_state == NULL || (temp_cost + temp_hn) < (pot_cost + pot_hn)) {
-                pot_state = temp_state;
-                pot_hn    = temp_hn;
-                pot_cost  = temp_cost;
+            temp_cost += temp_hn;
+
+            cout << "Temporary state" << endl;
+            for (size_t i = 0; i < SIZE; i++) {
+              cout << temp_state[i];
             }
+            cout << endl;
 
             for (size_t i = 0; i < observed.size(); i++) {
                 match = 0;
                 for (size_t j = 0; j < SIZE; j++) {
-                    if (observed[i].get_state()[j] == temp_state[j]) {
+                    if (observed[i].getState()[j] == temp_state[j]) {
                         match += 1;
                     }
                 }
@@ -178,7 +197,7 @@ int main(int argc, const char* argv[]) {
                 if (match == SIZE) {
                     // Do not push duplicates into list unless cost is less
                     // then remove pre-existing node
-                    if (observed[i].get_hn() < temp_hn) {
+                    if (observed[i].getHn() < temp_hn) {
                         skip = false; 
                     } else {
                         skip = true;
@@ -188,22 +207,31 @@ int main(int argc, const char* argv[]) {
             }
 
             if (skip != true) {
-                observed.push_back(Node(temp_state, temp_hn));
+                observed.push_back(Node(temp_state, temp_hn, temp_cost));
                 states_expanded += 1;
             }
         }
 
-        // Step 7 - Push state into visited list
-        visited.push_back(Node(pot_state, pot_hn));
+        // Step 7 - Mark least costing path as visited
+        temp_cost = 0;
+        for (size_t i = 0; i < observed.size(); i++) {
+            if ((temp_cost < observed[i].getCost() || i == 0)
+                && observed[i].getVisited() != true) {
+                index = i;
+                temp_cost = observed[i].getCost();
+            }
+        }
+
+        observed[index].setVisited();
 
         // Step 8 - Collect the current total cost
-        total_cost += pot_cost;
+        total_cost += observed[index].getCost();
 
         // Log New State
         for (int i = 0; i < SIZE; i++) {
-            if (pot_state[i] == WHITE) {
+            if (observed[index].getState()[i] == WHITE) {
                 cout << "W";
-            } else if (pot_state[i] == BLACK) {
+            } else if (observed[index].getState()[i] == BLACK) {
                 cout << "B";
             } else {
                 cout << "E";
@@ -211,10 +239,10 @@ int main(int argc, const char* argv[]) {
         }
 
         cout << " : G(n) = " << to_string(total_cost) << " : h(n) = " 
-          << to_string(pot_hn) << endl;
+          << to_string(observed[index].getHn()) << endl;
 
         // Step 9 - Check if state is equal to goal state
-        if (pot_hn == 0) {
+        if (observed[index].getHn() == 0) {
             finished = true;
         }
     }
