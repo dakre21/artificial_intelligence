@@ -75,6 +75,12 @@ int main(int argc, const char* argv[]) {
         }
         cout << endl;
 
+        if (states_expanded > 1) {
+            return 0;
+        }
+
+
+
         for (size_t i = 0; i < SIZE; i++) {
             if (curr_state[i] == EMPTY) {
                 empty_pos = i;
@@ -178,8 +184,6 @@ int main(int argc, const char* argv[]) {
                 }
             }
 
-            temp_cost += temp_hn;
-
             cout << "Temporary state" << endl;
             for (size_t i = 0; i < SIZE; i++) {
               cout << temp_state[i];
@@ -207,18 +211,29 @@ int main(int argc, const char* argv[]) {
             }
 
             if (skip != true) {
-                observed.push_back(Node(temp_state, temp_hn, temp_cost));
+                observed.push_back(Node(temp_state, temp_hn, (temp_cost + total_cost)));
                 states_expanded += 1;
             }
         }
 
         // Step 7 - Mark least costing path as visited
-        temp_cost = 0;
+        temp_cost = 1000000;
         for (size_t i = 0; i < observed.size(); i++) {
-            if ((temp_cost < observed[i].getCost() || i == 0)
+            cout << "Iteration " << to_string(i) << endl;
+            cout << "Obs cost " << to_string(observed[i].getCost()) << endl;
+            cout << "Obs hn " << to_string(observed[i].getHn()) << endl;
+            cout << "Obs visited " << to_string(observed[i].getVisited()) << endl;
+            cout << "Obs state " << endl;
+            for (size_t j = 0; j < SIZE; j++) {
+                cout << observed[i].getState()[j];
+            }
+            cout << endl;
+            if ((temp_cost > observed[i].getCost() || i == 0)
                 && observed[i].getVisited() != true) {
+                cout << "In here" << endl;
                 index = i;
                 temp_cost = observed[i].getCost();
+                cout << "Temp cost " << to_string(temp_cost) << endl;
             }
         }
 
