@@ -31,7 +31,6 @@ vector<Node> observed;
 int main(int argc, const char* argv[]) {
     // Forward declarations
     int   hn               = 3;
-    int   total_cost       = 0;
     int   states_expanded  = 0;
     int   empty_pos        = 0;
     int   temp_hn          = 0;
@@ -77,9 +76,9 @@ int main(int argc, const char* argv[]) {
         }
         cout << endl;
 
-        if (count > 5) {
+        /*if (count > 5) {
             return 0;
-        }
+        }*/
 
         cout << "*********************BIG LOOP ITERATION************* " << to_string(count) << endl;
 
@@ -213,7 +212,8 @@ int main(int argc, const char* argv[]) {
             }
 
             if (skip != true) {
-                observed.push_back(Node(temp_state, temp_hn, (temp_cost + total_cost)));
+                observed.push_back(Node(temp_state, temp_hn, 
+                      (temp_cost + observed[index].getCost())));
                 states_expanded += 1;
             }
         }
@@ -251,9 +251,6 @@ int main(int argc, const char* argv[]) {
 
         observed[index].setVisited();
 
-        // Step 8 - Collect the current total cost
-        total_cost += observed[index].getCost();
-
         // Log New State
         for (int i = 0; i < SIZE; i++) {
             if (observed[index].getState()[i] == WHITE) {
@@ -265,7 +262,7 @@ int main(int argc, const char* argv[]) {
             }
         }
 
-        cout << " : G(n) = " << to_string(total_cost) << " : h(n) = " 
+        cout << " : G(n) = " << to_string(observed[index].getCost()) << " : h(n) = " 
           << to_string(observed[index].getHn()) << endl;
 
         // Step 9 - Check if state is equal to goal state
@@ -277,6 +274,6 @@ int main(int argc, const char* argv[]) {
     }
 
     // Log total states and cost
-    cout << "Total cost = " << to_string(total_cost) << endl;
+    cout << "Total cost = " << to_string(observed[index].getCost()) << endl;
     cout << "Number of states expanded = " << to_string(states_expanded) << endl;
 }
