@@ -64,6 +64,8 @@ int main(int argc, const char* argv[]) {
     // Log Initial state
     cout << "BBBWWWE : G(n) = 0 : h(n) = " << to_string(hn) << endl;
 
+    int count = 0;
+
     // Step 3 - Loop until solution found
     while (finished != true) {
         // Step 4 - Grab current node and state
@@ -75,11 +77,11 @@ int main(int argc, const char* argv[]) {
         }
         cout << endl;
 
-        if (states_expanded > 1) {
+        if (count > 5) {
             return 0;
         }
 
-
+        cout << "*********************BIG LOOP ITERATION************* " << to_string(count) << endl;
 
         for (size_t i = 0; i < SIZE; i++) {
             if (curr_state[i] == EMPTY) {
@@ -217,7 +219,7 @@ int main(int argc, const char* argv[]) {
         }
 
         // Step 7 - Mark least costing path as visited
-        temp_cost = 1000000;
+        temp_cost = 0;
         for (size_t i = 0; i < observed.size(); i++) {
             cout << "Iteration " << to_string(i) << endl;
             cout << "Obs cost " << to_string(observed[i].getCost()) << endl;
@@ -228,12 +230,22 @@ int main(int argc, const char* argv[]) {
                 cout << observed[i].getState()[j];
             }
             cout << endl;
-            if ((temp_cost > observed[i].getCost() || i == 0)
-                && observed[i].getVisited() != true) {
-                cout << "In here" << endl;
-                index = i;
-                temp_cost = observed[i].getCost();
-                cout << "Temp cost " << to_string(temp_cost) << endl;
+
+            if (observed[i].getVisited() != true) {
+                if (temp_cost == 0) {
+                    cout << "In here 1" << endl;
+                    index = i;
+                    temp_cost = observed[i].getCost();
+                    temp_hn = observed[i].getHn();
+                    cout << "Temp cost " << to_string(temp_cost) << endl;
+                } else if ((temp_cost + temp_hn) > 
+                    (observed[i].getCost() + observed[i].getHn())) {
+                    cout << "In here 2" << endl;
+                    index = i;
+                    temp_cost = observed[i].getCost();
+                    temp_hn = observed[i].getHn();
+                    cout << "Temp cost " << to_string(temp_cost) << endl;
+                }
             }
         }
 
@@ -260,6 +272,8 @@ int main(int argc, const char* argv[]) {
         if (observed[index].getHn() == 0) {
             finished = true;
         }
+
+        count++;
     }
 
     // Log total states and cost
