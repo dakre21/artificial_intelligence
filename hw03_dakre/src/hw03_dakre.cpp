@@ -47,16 +47,6 @@ int main(int argc, const char* argv[]) {
     Node node = Node(init_state, hn, 0);
     node.setVisited();
 
-    for (size_t i = 0; i < SIZE; i++) {
-        cout << to_string(init_state[i]);
-    }
-    cout << endl;
-
-    for (size_t i = 0; i < SIZE; i++) {
-        cout << to_string(node.getState()[i]);
-    }
-    cout << endl;
-
     // Step 2 - Push initial node into observed structures
     observed.push_back(node);
 
@@ -70,22 +60,9 @@ int main(int argc, const char* argv[]) {
         // Step 4 - Grab current node and state
         curr_state = observed[index].getState();
 
-        cout << "Current state" << endl;
-        for (size_t i = 0; i < SIZE; i++) {
-          cout << curr_state[i];
-        }
-        cout << endl;
-
-        /*if (count > 5) {
-            return 0;
-        }*/
-
-        cout << "*********************BIG LOOP ITERATION************* " << to_string(count) << endl;
-
         for (size_t i = 0; i < SIZE; i++) {
             if (curr_state[i] == EMPTY) {
                 empty_pos = i;
-                cout << "Empty pos " << to_string(empty_pos) << endl;
             }
         }
 
@@ -101,7 +78,6 @@ int main(int argc, const char* argv[]) {
             // Switch on the action
             switch (action) {
                 case ADJ_MOVE_L:
-                    cout << "ADJ L MOVE" << endl;
                     if (empty_pos < (SIZE - 1)) {
                         temp_state[empty_pos+1] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos+1];
@@ -112,7 +88,6 @@ int main(int argc, const char* argv[]) {
                     break;
                 
                 case ADJ_MOVE_R:
-                    cout << "ADJ R MOVE" << endl;
                     if (empty_pos > 0) {
                         temp_state[empty_pos-1] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos-1];
@@ -124,7 +99,6 @@ int main(int argc, const char* argv[]) {
                     break;
 
                 case HOP_ONE_L:
-                    cout << "HOP ONE L" << endl;
                     if (empty_pos < (SIZE - 2)) {
                         temp_state[empty_pos+2] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos+2];
@@ -136,7 +110,6 @@ int main(int argc, const char* argv[]) {
                     break;
 
                 case HOP_ONE_R:
-                    cout << "HOP ONE R" << endl;
                     if (empty_pos > 1) {
                         temp_state[empty_pos-2] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos-2];
@@ -148,7 +121,6 @@ int main(int argc, const char* argv[]) {
                     break;
 
                 case HOP_TWO_L:
-                    cout << "HOP TWO L" << endl;
                     if (empty_pos < (SIZE - 3)) {
                         temp_state[empty_pos+3] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos+3];
@@ -160,7 +132,6 @@ int main(int argc, const char* argv[]) {
                     break;
 
                 case HOP_TWO_R:
-                    cout << "HOP TWO R" << endl;
                     if (empty_pos > 2) {
                         temp_state[empty_pos-3] = curr_state[empty_pos];
                         temp_state[empty_pos] = curr_state[empty_pos-3];
@@ -184,12 +155,6 @@ int main(int argc, const char* argv[]) {
                     temp_hn += 1;
                 }
             }
-
-            cout << "Temporary state" << endl;
-            for (size_t i = 0; i < SIZE; i++) {
-              cout << temp_state[i];
-            }
-            cout << endl;
 
             for (size_t i = 0; i < observed.size(); i++) {
                 match = 0;
@@ -221,30 +186,12 @@ int main(int argc, const char* argv[]) {
         // Step 7 - Mark least costing path as visited
         temp_cost = 0;
         for (size_t i = 0; i < observed.size(); i++) {
-            cout << "Iteration " << to_string(i) << endl;
-            cout << "Obs cost " << to_string(observed[i].getCost()) << endl;
-            cout << "Obs hn " << to_string(observed[i].getHn()) << endl;
-            cout << "Obs visited " << to_string(observed[i].getVisited()) << endl;
-            cout << "Obs state " << endl;
-            for (size_t j = 0; j < SIZE; j++) {
-                cout << observed[i].getState()[j];
-            }
-            cout << endl;
-
             if (observed[i].getVisited() != true) {
-                if (temp_cost == 0) {
-                    cout << "In here 1" << endl;
+                if (temp_cost == 0 || ((temp_cost + temp_hn) > 
+                    (observed[i].getCost() + observed[i].getHn()))) {
                     index = i;
                     temp_cost = observed[i].getCost();
                     temp_hn = observed[i].getHn();
-                    cout << "Temp cost " << to_string(temp_cost) << endl;
-                } else if ((temp_cost + temp_hn) > 
-                    (observed[i].getCost() + observed[i].getHn())) {
-                    cout << "In here 2" << endl;
-                    index = i;
-                    temp_cost = observed[i].getCost();
-                    temp_hn = observed[i].getHn();
-                    cout << "Temp cost " << to_string(temp_cost) << endl;
                 }
             }
         }
@@ -265,7 +212,7 @@ int main(int argc, const char* argv[]) {
         cout << " : G(n) = " << to_string(observed[index].getCost()) << " : h(n) = " 
           << to_string(observed[index].getHn()) << endl;
 
-        // Step 9 - Check if state is equal to goal state
+        // Step 8 - Check if state is equal to goal state
         if (observed[index].getHn() == 0) {
             finished = true;
         }
