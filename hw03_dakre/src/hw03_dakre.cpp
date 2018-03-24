@@ -185,13 +185,16 @@ int main(int argc, const char* argv[]) {
 
         // Step 7 - Mark least costing path as visited
         temp_cost = 0;
+        temp_hn = 0;
         for (size_t i = 0; i < observed.size(); i++) {
             if (observed[i].getVisited() != true) {
                 if (temp_cost == 0 || ((temp_cost + temp_hn) > 
                     (observed[i].getCost() + observed[i].getHn()))) {
-                    index = i;
-                    temp_cost = observed[i].getCost();
-                    temp_hn = observed[i].getHn();
+                    if (observed[i].getHn() <= observed[index].getHn()) {
+                        index = i;
+                        temp_cost = observed[i].getCost();
+                        temp_hn = observed[i].getHn();
+                    }
                 }
             }
         }
