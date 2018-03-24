@@ -28,6 +28,44 @@ array<int, SIZE> init_state = {
 
 vector<Node> observed;
 
+bool readInput() {
+    // Forward declarations
+    string input = "";
+    string error = "ERROR: Please enter in the correct amount of tiles "\
+                    "(e.g. 3 White, 3 Black, 1 Empty and ensure letters are in CAPS)";
+    size_t ecnt  = 0;
+    size_t wcnt  = 0;
+    size_t bcnt  = 0;
+
+    cout << "Enter initial state: ";
+    getline(cin, input);
+
+    if (input.length() != SIZE) {
+        cout << error << endl;
+        return false;
+    }
+
+    for (size_t i = 0; i < input.length(); i++) {
+        if (input[i] == 'W') {
+            init_state[i] = WHITE;
+            wcnt += 1;
+        } else if (input[i] == 'B') {
+            init_state[i] = BLACK;
+            bcnt += 1;
+        } else if (input[i] == 'E') {
+            init_state[i] = EMPTY;
+            ecnt += 1;
+        }
+    }
+
+    if (ecnt != 1 || bcnt != 3 || wcnt != 3) {
+        cout << error << endl;
+        return false;
+    }
+
+    return true;
+}
+
 int main(int argc, const char* argv[]) {
     // Forward declarations
     int   hn               = 3;
@@ -42,6 +80,11 @@ int main(int argc, const char* argv[]) {
     array<int, SIZE> curr_state;
     array<int, SIZE> temp_state;
 
+    // Step 0 - Read in user input
+    if (readInput() != true) {
+        return -1;
+    }
+
     // Start A* process
     // Step 1 - Populate Initial Node
     Node node = Node(init_state, hn, 0);
@@ -50,10 +93,28 @@ int main(int argc, const char* argv[]) {
     // Step 2 - Push initial node into observed structures
     observed.push_back(node);
 
-    // Log Initial state
-    cout << "BBBWWWE : G(n) = 0 : h(n) = " << to_string(hn) << endl;
+    // Check if the initial state meets goal state
+    for (size_t i = 0; i < SIZE; i++) {
+        if (init_state[i] == BLACK && i < 4) {
+            temp_hn += 1;
+        }
+    }
 
-    int count = 0;
+    // Log Initial state
+    for (size_t i = 0; i < SIZE; i++) {
+        if (init_state[i] == WHITE) {
+            cout << "W";
+        } else if (init_state[i] == BLACK) {
+            cout << "B";
+        } else {
+            cout << "E";
+        }
+    }
+    cout << " : G(n) = 0 : h(n) = " << to_string(temp_hn) << endl;
+
+    if (temp_hn == 0) {
+        finished = true;
+    }
 
     // Step 3 - Loop until solution found
     while (finished != true) {
@@ -219,11 +280,11 @@ int main(int argc, const char* argv[]) {
         if (observed[index].getHn() == 0) {
             finished = true;
         }
-
-        count++;
     }
 
     // Log total states and cost
     cout << "Total cost = " << to_string(observed[index].getCost()) << endl;
     cout << "Number of states expanded = " << to_string(states_expanded) << endl;
+
+    return 0;
 }
